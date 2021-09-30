@@ -1,23 +1,23 @@
-LED0 			EQU 	0x422101a0 
+LED0 		EQU 	0x422101a0 
 RCC_APB2ENR 	EQU 	0x40021018
-GPIOA_CRH 		EQU 	0x40010804
+GPIOA_CRH 	EQU 	0x40010804
 Stack_Size      EQU     0x00000400
-; EQU αָ���һ������������һ����������ʽ��һ�������ı��������������� 3 �ָ�ʽ��name EQU expression     name EQU symbol    name EQU <text>	 
-; ���ų�����ռ���ڴ棬������c�ĺ�
+; EQU 伪指令把一个符号名称与一个整数表达式或一个任意文本连接起来，它有 3 种格式：name EQU expression     name EQU symbol    name EQU <text>	 
+; 符号常量不占用内存，类似于c的宏
 
                 AREA    STACK, NOINIT, READWRITE, ALIGN=3
 Stack_Mem       SPACE   Stack_Size
 __initial_sp
 
-;AREAαָ�����ڶ���һ������λ����ݶΡ������������ֿ�ͷ��ö������á�|�������� 
-;AREA ���� ����1 ������2 ������  
-;	CODE 		���ԣ����ڶ������Σ�Ĭ��ΪREADONLY     
-;	DATA 		���ԣ����ڶ������ݶΣ�Ĭ��ΪREADWRITE     
-;	READONLY 	���ԣ�ָ������Ϊֻ���������Ĭ��ΪREADONLY     
-;	READWRITE 	���ԣ�ָ������Ϊ�ɶ���д�����ݶε�Ĭ������ΪREADWRITE     
-;	ALIGN 		���ԣ�����κ����ݶ��ǰ��ֶ���ģ�����ʽ��ȡֵ��ΧΪ0��31����Ӧ�Ķ��뷽ʽΪ2����ʽ�η���
-;	NOINIT		ָ�������ݶν����������ڴ浥Ԫ����û�н�����ʼֵд���ڴ浥Ԫ�����߽������ڴ浥Ԫֵ��ʼ��Ϊ0
-;SPACE  ����һƬ�ڴ�ռ� ������ֵ
+;AREA伪指令用于定义一个代码段或数据段。段名若以数字开头则该段名需用“|”括起来 
+;AREA 段名 属性1 ，属性2 ，……  
+;	CODE 		属性：用于定义代码段，默认为READONLY     
+;	DATA 		属性：用于定义数据段，默认为READWRITE     
+;	READONLY 	属性：指定本段为只读，代码段默认为READONLY     
+;	READWRITE 	属性：指定本段为可读可写，数据段的默认属性为READWRITE     
+;	ALIGN 		属性：代码段和数据段是按字对齐的，表达式的取值范围为0～31，相应的对齐方式为2表达式次方。
+;	NOINIT		指定此数据段仅仅保留了内存单元，而没有将各初始值写入内存单元，或者将各个内存单元值初始化为0
+;SPACE  申请一片内存空间 不赋初值
 
 
                 AREA    RESET, DATA, READONLY
@@ -33,10 +33,10 @@ __Vectors       DCD     __initial_sp               ; Top of Stack
                 REQUIRE8
                 PRESERVE8
 
-;. text ��ʾ�����
-;DCD ��һ�����ڷ���һ�����߶���ֵ��ڴ棬������ڴ������ֽڶ���ģ�ͬʱ������ѷ���洢��Ԫ�ĳ�ʼ��
-;��� DCD  ����ʽ    ���б���ʽ����Ϊ�����Ż����ֱ���ʽ
-;ENTRYαָ������ָ�����������ڵ㡣��һ�������Ļ�����������Ҫ��һ��ENTRY 
+;. text 表示代码段
+;DCD ：一般用于分配一个或者多个字的内存，分配的内存是四字节对齐的，同时可完成已分配存储单元的初始化
+;标号 DCD  表达式    其中表达式可以为程序标号或数字表达式
+;ENTRY伪指令用于指定汇编程序的入口点。在一个完整的汇编程序中至少要有一个ENTRY 
 
                 ENTRY
 Reset_Handler 
@@ -48,9 +48,9 @@ MainLoop        BL LED_ON
                 
                 B MainLoop
  
-;MainLoop  ����ǳ䵱ָ�������λ�ñ�ǵı�ʶ��  ���ݱ�ű�ʶ�˱����ĵ�ַ   ������ͨ��������ת��ѭ��ָ���Ŀ���ַ(����ʡ��)
-;BL ������ת�� ��תʱ����һ��ָ��ĵ�ַ����LR�Ĵ�����
-;BL LED_Init   ����һ��ָ���ַ����LR�Ĵ����У�Ȼ��LED_Init�ĵ�ַ����PC��ʵ����ת
+;MainLoop  标号是充当指令或数据位置标记的标识符  数据标号标识了变量的地址   代码标号通常用作跳转和循环指令的目标地址(可以省略)
+;BL 连接跳转， 跳转时将下一条指令的地址存入LR寄存器中
+;BL LED_Init   将下一条指令地址存入LR寄存器中，然后将LED_Init的地址放入PC中实现跳转
 
 LED_Init
                 PUSH {R0,R1, LR}
@@ -75,8 +75,8 @@ LED_Init
                 STR R0,[R1]
              
                 POP {R0,R1,PC} 		
-;PUSH ��ջ����Ĵ���ֵ   POP ��ջ  �ָ��Ĵ���ֵ   
-;PUSH {R0,R1, LR}  ���� R0 �Ĵ���ֵ ��Ϊ���ӳ����õ�R0 R1  ����LR���ӼĴ�����ֵ  �����ӳ��򷵻�
+;PUSH 入栈保存寄存器值   POP 出栈  恢复寄存器值   
+;PUSH {R0,R1, LR}  保存 R0 寄存器值 因为后子程序将用到R0 R1  保存LR连接寄存器的值  用于子程序返回
            
 LED_ON
                 PUSH {R0,R1, LR}    
@@ -87,8 +87,8 @@ LED_ON
              
                 POP {R0,R1,PC}
 			
-;PUSH ��ջ����Ĵ���ֵ   POP ��ջ  �ָ��Ĵ���ֵ   
-;PUSH {R0,R1, LR}  ���� R0 �Ĵ���ֵ ��Ϊ���ӳ����õ�R0 R1  ����LR���ӼĴ�����ֵ  �����ӳ��򷵻�            
+;PUSH 入栈保存寄存器值   POP 出栈  恢复寄存器值   
+;PUSH {R0,R1, LR}  保存 R0 寄存器值 因为后子程序将用到R0 R1  保存LR连接寄存器的值  用于子程序返回            
 LED_OFF
                 PUSH {R0,R1, LR}    
                 
@@ -97,8 +97,8 @@ LED_OFF
                 STR R0,[R1]
              
                 POP {R0,R1,PC}  
-;PUSH ��ջ����Ĵ���ֵ   POP ��ջ  �ָ��Ĵ���ֵ   
-;PUSH {R0,R1, LR}  ���� R0 �Ĵ���ֵ ��Ϊ���ӳ����õ�R0 R1  ����LR���ӼĴ�����ֵ  �����ӳ��򷵻�	 
+;PUSH 入栈保存寄存器值   POP 出栈  恢复寄存器值   
+;PUSH {R0,R1, LR}  保存 R0 寄存器值 因为后子程序将用到R0 R1  保存LR连接寄存器的值  用于子程序返回	 
  
 Delay
                 PUSH {R0,R1, LR}
@@ -127,11 +127,11 @@ DelayLoop0
                 
                 POP {R0,R1,PC}
 				
-;LED_Init   �Ǵ����� ������������ת				
-;LED_ON   �Ǵ����� ������������ת					
-;LED_OFF   �Ǵ����� ������������ת
-;Delay   �Ǵ����� ������������ת				
-;DelayLoop0   �Ǵ����� ������������ת					
+;LED_Init   是代码标号 ，用作程序跳转				
+;LED_ON   是代码标号 ，用作程序跳转					
+;LED_OFF   是代码标号 ，用作程序跳转
+;Delay   是代码标号 ，用作程序跳转				
+;DelayLoop0   是代码标号 ，用作程序跳转					
        
 NMI_Handler      PROC
                  EXPORT  NMI_Handler                [WEAK]
@@ -144,11 +144,11 @@ HardFault_Handler\
                  ENDP
 
 					
-; PROC		: �Ƕ����ӳ����αָ�λ�����ӳ���Ŀ�ʼ������ENDP�ֱ��ʾ�ӳ�����Ŀ�ʼ�ͽ������߱���ɶԳ���
-; IMPORT	������Ϊ���ڻ����룬����Ҫ���õĺ���Ϊ�ⲿ�ļ�����
-; EXPORTt	������Ϊ���ڻ�����������÷��ſ��Ա��ⲿģ��ʹ�ã�������C�е�extern����
-;  B   .    : ��.�� ������ǰ��ַ��BΪ��������ת,������ѭ��
-;[WEAK]     :һ����˵����ؼ���ʹ����IMPORT��EXPORT������������,EXPORT�ĺ�������WEAK��־�����ұ��Դ����û�ж���ͬ����������ô����ʱ���Ǹú��������򣬾��������һ��ͬ������.WEAK���ڸǺ���������
+; PROC		: 是定义子程序的伪指令，位置在子程序的开始处，和ENDP分别表示子程序定义的开始和结束两者必须成对出现
+; IMPORT	：翻译为进口或引入，表明要调用的函数为外部文件定义
+; EXPORTt	：翻译为出口或输出，表明该符号可以被外部模块使用，类似于C中的extern功能
+;  B   .    : “.” 代表当前地址，B为无条件跳转,用于死循环
+;[WEAK]     :一般来说这个关键字使用在IMPORT和EXPORT这两个声明段,EXPORT的函数带有WEAK标志，并且别的源代码没有定义同名函数，那么连接时就是该函数；否则，就是另外的一个同名函数.WEAK有掩盖函数的作用
 
 
 Default_Handler PROC
@@ -167,10 +167,10 @@ IRQ005_Handler
 
                 B       .
                 ENDP
-;Default_Handler     Ϊ�����жϺ�������Ĭ�ϵ��ж����
+;Default_Handler     为所有中断函数定义默认的中断入口
 
 				END
-;ENDP    ��ʾPROC������Ĺ��̽���. (end procedure)
-;ENDS    ��ʾSEGMENT����Ķν���.   (end segment)
-;END     �������.	
+;ENDP    表示PROC所定义的过程结束. (end procedure)
+;ENDS    表示SEGMENT定义的段结束.   (end segment)
+;END     程序结束.	
 
