@@ -76,7 +76,7 @@ LED_Init
              
                 POP {R0,R1,PC} 		
 ;PUSH 入栈保存寄存器值   POP 出栈  恢复寄存器值   
-;PUSH {R0,R1, LR}  保存 R0 寄存器值 因为后子程序将用到R0 R1  保存LR连接寄存器的值  用于子程序返回
+;PUSH {R0,R1, LR}  保存R0,R1 寄存器值 因为子程序将用到R0 R1 ,保存LR连接寄存器的值,用于子程序返回
            
 LED_ON
                 PUSH {R0,R1, LR}    
@@ -88,7 +88,7 @@ LED_ON
                 POP {R0,R1,PC}
 			
 ;PUSH 入栈保存寄存器值   POP 出栈  恢复寄存器值   
-;PUSH {R0,R1, LR}  保存 R0 寄存器值 因为后子程序将用到R0 R1  保存LR连接寄存器的值  用于子程序返回            
+;PUSH {R0,R1, LR}  保存R0,R1 寄存器值 因为子程序将用到R0 R1 ,保存LR连接寄存器的值,用于子程序返回          
 LED_OFF
                 PUSH {R0,R1, LR}    
                 
@@ -98,7 +98,7 @@ LED_OFF
              
                 POP {R0,R1,PC}  
 ;PUSH 入栈保存寄存器值   POP 出栈  恢复寄存器值   
-;PUSH {R0,R1, LR}  保存 R0 寄存器值 因为后子程序将用到R0 R1  保存LR连接寄存器的值  用于子程序返回	 
+;PUSH {R0,R1, LR}  保存R0,R1 寄存器值 因为子程序将用到R0 R1 ,保存LR连接寄存器的值,用于子程序返回	 
  
 Delay
                 PUSH {R0,R1, LR}
@@ -127,11 +127,11 @@ DelayLoop0
                 
                 POP {R0,R1,PC}
 				
-;LED_Init   是代码标号 ，用作程序跳转				
-;LED_ON   是代码标号 ，用作程序跳转					
-;LED_OFF   是代码标号 ，用作程序跳转
-;Delay   是代码标号 ，用作程序跳转				
-;DelayLoop0   是代码标号 ，用作程序跳转					
+;LED_Init   	是代码标号 ，用作程序跳转				
+;LED_ON   	是代码标号 ，用作程序跳转					
+;LED_OFF   	是代码标号 ，用作程序跳转
+;Delay   	是代码标号 ，用作程序跳转				
+;DelayLoop0   	是代码标号 ，用作程序跳转					
        
 NMI_Handler      PROC
                  EXPORT  NMI_Handler                [WEAK]
@@ -147,10 +147,10 @@ HardFault_Handler\
 ; PROC		: 是定义子程序的伪指令，位置在子程序的开始处，和ENDP分别表示子程序定义的开始和结束两者必须成对出现
 ; IMPORT	：翻译为进口或引入，表明要调用的函数为外部文件定义
 ; EXPORTt	：翻译为出口或输出，表明该符号可以被外部模块使用，类似于C中的extern功能
-;  B   .    : “.” 代表当前地址，B为无条件跳转,用于死循环
+;  B   .    	: “.” 代表当前地址，B为无条件跳转,用于死循环
 ;[WEAK]     :一般来说这个关键字使用在IMPORT和EXPORT这两个声明段,EXPORT的函数带有WEAK标志，并且别的源代码没有定义同名函数，那么连接时就是该函数；否则，就是另外的一个同名函数.WEAK有掩盖函数的作用
 
-
+;Default_Handler     为所有中断函数定义默认的中断入口
 Default_Handler PROC
                 EXPORT  IRQ000_Handler        [WEAK]
                 EXPORT  IRQ001_Handler        [WEAK]
@@ -167,9 +167,8 @@ IRQ005_Handler
 
                 B       .
                 ENDP
-;Default_Handler     为所有中断函数定义默认的中断入口
-
-				END
+		
+		END
 ;ENDP    表示PROC所定义的过程结束. (end procedure)
 ;ENDS    表示SEGMENT定义的段结束.   (end segment)
 ;END     程序结束.	
